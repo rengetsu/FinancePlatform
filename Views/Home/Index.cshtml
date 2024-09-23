@@ -6,3 +6,24 @@
     <h1 class="display-4">Welcome</h1>
     <p>Welcome to Finance Platform</p>
 </div>
+
+@model FinancePlatform.Models.TextModel
+
+@{
+    ViewBag.Title = "Text Processing";
+}
+
+<h2>Enter Text</h2>
+
+@using (Html.BeginForm("ProcessText", "Home", FormMethod.Post))
+{
+    <div>
+        @Html.TextBoxFor(model => model.InputText)
+        <input type="submit" value="Submit" />
+    </div>
+}
+
+@if (Model.ProcessedText != null)
+{
+    <h3>Processed Text: @Model.ProcessedText</h3>
+}
