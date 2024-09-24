@@ -6,30 +6,22 @@ namespace FinancePlatform.Controllers
 {
     public class HomeController : Controller
     {
-        // POST: ProcessText
-        [HttpPost]
-        public ActionResult ProcessText(TextModel model)
+        private readonly StockService _stockService;
+
+        // Consolidated constructor
+        public HomeController(StockService stockService, ILogger<HomeController> logger)
         {
-            // Create an instance of the TextProcessor class
-            TextProcessor processor = new TextProcessor();
-
-            // Call getTickerRequest to get the result
-            model.ProcessedText = processor.getTickerRequest(model.InputText);
-
-            // Pass the model back to the view with the processed text
-            return View("Index", model);
+            _stockService = stockService;
+            _logger = logger;
         }
+        
 
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
 
         public IActionResult Index()
         {
-            return View(new TextModel());
+            return View(new StockPrice());
         }
 
         public IActionResult Privacy()
@@ -41,6 +33,21 @@ namespace FinancePlatform.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetStockPrice(string symbol)
+        {
+            
+            if (string.IsNullOrWhiteSpace(symbol))
+            {
+                ModelState.AddModelError(string.Empty, "Please enter a stock symbol.");
+                return View("Index");
+            }
+
+            var stockPrice = await _stockService.GetStockPriceAsync(symbol);
+
+            return View("Index", stockPrice);
         }
     }
 }
