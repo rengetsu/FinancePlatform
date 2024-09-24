@@ -7,7 +7,7 @@ namespace FinancePlatform
 {
     public class HistoricalStockData
     {
-        public void getTickerRequest(string tickerName)
+        public string getTickerRequest(string tickerName)
         {
             char continueStr = 'y';
             while (continueStr == 'y')
@@ -15,6 +15,7 @@ namespace FinancePlatform
                 Console.WriteLine("Enter a stock ticker than you want historic data for: ");
                 string symbol = tickerName.ToUpper();
             }
+            return tickerName;
         }
     }
 

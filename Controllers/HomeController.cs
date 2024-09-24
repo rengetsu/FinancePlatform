@@ -13,8 +13,8 @@ namespace FinancePlatform.Controllers
             // Create an instance of the TextProcessor class
             TextProcessor processor = new TextProcessor();
 
-            // Process the text from the model
-            model.ProcessedText = processor.ProcessText(model.InputText);
+            // Call getTickerRequest to get the result
+            model.ProcessedText = processor.getTickerRequest(model.InputText);
 
             // Pass the model back to the view with the processed text
             return View("Index", model);
