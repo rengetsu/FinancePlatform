@@ -1,24 +1,40 @@
-﻿@{
-    ViewData["Title"] = "Stock View";
-}
+﻿@model FinancePlatform.Models.StockResponse
 
-<h2>@ViewData["Title"]</h2>
+<h2>Submit a Stock Symbol</h2>
 
-<!-- Form for submitting stock data -->
 <form asp-controller="Stock" asp-action="SubmitStock" method="post">
     <input type="text" name="stockData" placeholder="Enter stock symbol" required />
     <button type="submit" class="btn btn-primary">Submit Stock</button>
 </form>
 
-<!-- Display the submitted stock name if available -->
-@if (ViewBag.StockName != null)
+@if (Model != null)
 {
-    <h3>Submitted Stock Symbol: @ViewBag.StockName</h3>
-}
+    <h2>Ticker: @Model.Ticker</h2>
+    <h2>Query Count: @Model.QueryCount</h2>
+    <h2>Results Count: @Model.ResultsCount</h2>
+    <h2>Adjusted: @(Model.Adjusted ? "Yes" : "No")</h2>
+    <h2>Status: @Model.Status</h2>
+    <h2>Request ID: @Model.Request_Id</h2>
+    <h2>Count: @Model.Count</h2>
 
-<!-- Display the stock information if available -->
-@if (ViewBag.StockInfo != null)
+    @if (Model.Results != null && Model.Results.Any())
+    {
+        <h2>Stock Data:</h2>
+
+        @foreach (var result in Model.Results)
+        {
+            <h2>Volume: @result.V</h2>
+            <h2>VWAP: @result.Vw</h2>
+            <h2>Open Price: @result.O</h2>
+            <h2>Close Price: @result.C</h2>
+            <h2>High Price: @result.H</h2>
+            <h2>Low Price: @result.L</h2>
+            <h2>Timestamp (Unix): @result.T</h2>
+            <h2>Number of Transactions: @result.N</h2>
+        }
+    }
+}
+else
 {
-    <h4>Stock Information:</h4>
-    <pre>@Html.Raw(ViewBag.StockInfo)</pre> <!-- Use pre to format JSON response -->
+    <h2>No data available.</h2>
 }

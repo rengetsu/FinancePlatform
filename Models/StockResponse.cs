@@ -1,28 +1,32 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace FinancePlatform.Models
 {
     public class StockResponse
     {
+        [JsonPropertyName("ticker")]
         public string Ticker { get; set; }
-        public int QueryCount { get; set; }
-        public int ResultsCount { get; set; }
-        public bool Adjusted { get; set; }
-        public List<Result> Results { get; set; }
-        public string Status { get; set; }
-        public string RequestId { get; set; }
-        public int Count { get; set; }
-    }
 
-    public class Result
-    {
-        public double V { get; set; }
-        public double Vw { get; set; }
-        public double O { get; set; }
-        public double C { get; set; }
-        public double H { get; set; }
-        public double L { get; set; }
-        public long T { get; set; }
-        public int N { get; set; }
+        [JsonPropertyName("queryCount")]
+        public int QueryCount { get; set; }
+
+        [JsonPropertyName("resultsCount")]
+        public int ResultsCount { get; set; }
+
+        [JsonPropertyName("adjusted")]
+        public bool Adjusted { get; set; }
+
+        [JsonPropertyName("results")]
+        public List<StockResult> Results { get; set; } // List for the results array
+
+        [JsonPropertyName("status")]
+        public string Status { get; set; }
+
+        [JsonPropertyName("request_id")]
+        public string Request_Id { get; set; }
+
+        [JsonPropertyName("count")]
+        public int Count { get; set; }
     }
 }

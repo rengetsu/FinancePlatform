@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FinancePlatform.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace FinancePlatform.Controllers
@@ -22,17 +24,19 @@ namespace FinancePlatform.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitStock(string stockData)
         {
-            string stockInfo = await GetStockDataAsync(stockData);
+            StockResponse stockInfo = await GetStockDataAsync(stockData);
 
             // Pass the stock information back to the view
-            ViewBag.StockInfo = stockInfo;
-            ViewBag.StockName = stockData;
+            //ViewBag.StockInfo = stockInfo;
+            //ViewBag.StockName = stockData;
+
+           
 
             // Return the StockView again
-            return View("StockView");
+            return View("StockView", stockInfo);
         }
 
-        private async Task<string> GetStockDataAsync(string stockSymbol)
+        private async Task<StockResponse> GetStockDataAsync(string stockSymbol)
         {
             string apiKey = "9aOImHeQjnqwk8XwwkMyTdMU_5YrTw30"; // Replace with your actual API key
             string url = $"https://api.polygon.io/v2/aggs/ticker/{stockSymbol}/range/1/day/2024-09-09/2024-09-09?apiKey={apiKey}";
@@ -41,11 +45,13 @@ namespace FinancePlatform.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                var data = await response.Content.ReadAsStringAsync();
-                return data; // Return the JSON response as a string
+                var jsonData = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(jsonData);
+                var stockResponse = JsonSerializer.Deserialize<StockResponse>(jsonData);
+                return stockResponse;
             }
 
-            return "Error retrieving stock data.";
+            return null;
         }
     }
 }
