@@ -1,30 +1,51 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace FinancePlatform.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class StockController : ControllerBase
+    public class StockController : Controller
     {
-        private readonly StockService _stockService;
+        private readonly HttpClient _httpClient;
 
-        public StockController()
+        public StockController(HttpClient httpClient)
         {
-            _stockService = new StockService();
+            _httpClient = httpClient;
         }
 
-        [HttpGet("{symbol}")]
-        public async Task<IActionResult> GetStockPrice(string symbol)
+        [HttpGet]
+        public IActionResult StockView()
         {
-            var stockPrice = await _stockService.GetStockPriceAsync(symbol);
+            return View();
+        }
 
-            if (stockPrice == null)
+        [HttpPost]
+        public async Task<IActionResult> SubmitStock(string stockData)
+        {
+            string stockInfo = await GetStockDataAsync(stockData);
+
+            // Pass the stock information back to the view
+            ViewBag.StockInfo = stockInfo;
+            ViewBag.StockName = stockData;
+
+            // Return the StockView again
+            return View("StockView");
+        }
+
+        private async Task<string> GetStockDataAsync(string stockSymbol)
+        {
+            string apiKey = "9aOImHeQjnqwk8XwwkMyTdMU_5YrTw30"; // Replace with your actual API key
+            string url = $"https://api.polygon.io/v2/aggs/ticker/{stockSymbol}/range/1/day/2024-09-09/2024-09-09?apiKey={apiKey}";
+
+            var response = await _httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
             {
-                return NotFound();
+                var data = await response.Content.ReadAsStringAsync();
+                return data; // Return the JSON response as a string
             }
 
-            return Ok(stockPrice);
+            return "Error retrieving stock data.";
         }
     }
 }

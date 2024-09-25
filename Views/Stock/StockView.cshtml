@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Stock View";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- Form for submitting stock data -->
+<form asp-controller="Stock" asp-action="SubmitStock" method="post">
+    <input type="text" name="stockData" placeholder="Enter stock symbol" required />
+    <button type="submit" class="btn btn-primary">Submit Stock</button>
+</form>
+
+<!-- Display the submitted stock name if available -->
+@if (ViewBag.StockName != null)
+{
+    <h3>Submitted Stock Symbol: @ViewBag.StockName</h3>
+}
+
+<!-- Display the stock information if available -->
+@if (ViewBag.StockInfo != null)
+{
+    <h4>Stock Information:</h4>
+    <pre>@Html.Raw(ViewBag.StockInfo)</pre> <!-- Use pre to format JSON response -->
+}
