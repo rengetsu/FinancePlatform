@@ -1,5 +1,7 @@
 ﻿@model FinancePlatform.Models.StockResponse
 
+<img src="~/images/polygon_io_logo.png" alt="Polygon.io logo" width="300"/>
+<hr>
 <h2>Submit a Stock Symbol</h2>
 
 <form asp-controller="Stock" asp-action="SubmitStock" method="post">
@@ -9,28 +11,32 @@
 
 @if (Model != null)
 {
-    <h2>Ticker: @Model.Ticker</h2>
-    <h2>Query Count: @Model.QueryCount</h2>
-    <h2>Results Count: @Model.ResultsCount</h2>
-    <h2>Adjusted: @(Model.Adjusted ? "Yes" : "No")</h2>
-    <h2>Status: @Model.Status</h2>
-    <h2>Request ID: @Model.Request_Id</h2>
-    <h2>Count: @Model.Count</h2>
+    <hr>
+    <h3>Query Data:</h3>
+    <hr>
+    <h5><b>Ticker:</b> @Model.Ticker</h5>
+    <h5><b>Query Count:</b> @Model.QueryCount</h5>
+    <h5><b>Results Count:</b> @Model.ResultsCount</h5>
+    <h5><b>Adjusted:</b> @(Model.Adjusted ? "Yes" : "No")</h5>
+    <h5><b>Status:</b> @Model.Status</h5>
+    <h5><b>Request ID:</b> @Model.Request_Id</h5>
+    <h5><b>Count:</b> @Model.Count</h5>
 
     @if (Model.Results != null && Model.Results.Any())
     {
-        <h2>Stock Data:</h2>
-
+        <hr>
+        <h3>Stock Data:</h3>
+        <hr>
         @foreach (var result in Model.Results)
         {
-            <h2>Volume: @result.V</h2>
-            <h2>VWAP: @result.Vw</h2>
-            <h2>Open Price: @result.O</h2>
-            <h2>Close Price: @result.C</h2>
-            <h2>High Price: @result.H</h2>
-            <h2>Low Price: @result.L</h2>
-            <h2>Timestamp (Unix): @result.T</h2>
-            <h2>Number of Transactions: @result.N</h2>
+            <h5><b>Volume:</b> @result.V</h5>
+            <h5><b>VWAP:</b> @result.Vw</h5>
+            <h5><b>Open Price:</b> @result.O</h5>
+            <h5><b>Close Price:</b> @result.C</h5>
+            <h5><b>High Price:</b> @result.H</h5>
+            <h5><b>Low Price:</b> @result.L</h5>
+            <h5><b>Timestamp (Unix):</b> @result.T</h5>
+            <h5><b>Number of Transactions:</b> @result.N</h5>
         }
     }
 }
