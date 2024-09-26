@@ -30,12 +30,6 @@ namespace FinancePlatform.Controllers
 
             StockResponse stockInfo = await GetStockDataAsync(stockData, formattedDate);
 
-            // Pass the stock information back to the view
-            //ViewBag.StockInfo = stockInfo;
-            //ViewBag.StockName = stockData;
-
-           
-
             // Return the StockView again
             return View("StockView", stockInfo);
         }
