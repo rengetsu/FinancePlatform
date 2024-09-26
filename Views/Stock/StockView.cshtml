@@ -6,6 +6,7 @@
 
 <form asp-controller="Stock" asp-action="SubmitStock" method="post">
     <input type="text" name="stockData" placeholder="Enter stock symbol" required />
+    <input type="date" name="stockTimeData" placeholder="Enter stock date" value="2024-09-25" min="2018-01-01" max="2024-12-31" required /> 
     <button type="submit" class="btn btn-primary">Submit Stock</button>
 </form>
 
