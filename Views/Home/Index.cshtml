@@ -6,34 +6,12 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Stock Price Checker</title>
+    <title>Finance Platform</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container">
-        <h1 class="mt-5">Stock Price Checker</h1>
-        <form asp-action="GetStockPrice" method="post" class="mt-3">
-            <div class="form-group">
-                <label for="symbol">Enter Stock Symbol:</label>
-                <input type="text" class="form-control" id="symbol" name="symbol" required />
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Get Stock Price</button>
-        </form>
-
-        @if (Model != null)
-        {
-            <div class="mt-4">
-                <h3>Stock Price for @Model.Symbol</h3>
-                <p>Price: @Model.Price</p>
-                <p>Timestamp: @Model.Timestamp</p>
-            </div>
-        }
+        <h1 class="mt-5">Finance Platform</h1>
     </div>
 </body>
 </html>
-
-@model FinancePlatform.Models.StockPrice
-
-@{
-    ViewBag.Title = "Text Processing";
-}

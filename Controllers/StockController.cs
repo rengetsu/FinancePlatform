@@ -51,5 +51,26 @@ namespace FinancePlatform.Controllers
 
             return null;
         }
+
+        [HttpPost]
+        public IActionResult AddToDatabase(string ticker, string date)
+        {
+            // Your logic to add stock data to the database
+
+            // Example: Create a new stock entry
+            var stockData = new StockEntity
+            {
+                Ticker = ticker,
+                Date = DateTime.Parse(date),
+                // Add more stock-related data as needed
+            };
+
+            // Assuming you have a DbContext for your database:
+            //_dbContext.Stocks.Add(stockData);
+            //_dbContext.SaveChanges();
+
+            // Redirect to another view or show success message
+            return RedirectToAction("StockView");
+        }
     }
 }

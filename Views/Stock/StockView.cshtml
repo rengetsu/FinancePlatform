@@ -39,6 +39,12 @@
             <h5><b>Timestamp (Unix):</b> @result.T</h5>
             <h5><b>Number of Transactions:</b> @result.N</h5>
         }
+        <!-- Add to Database button -->
+        <form asp-action="AddToDatabase" method="post">
+            <input type="hidden" name="ticker" value="@Model.Ticker" />
+            <input type="hidden" name="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" /> <!-- Add relevant date -->
+            <button type="submit" class="btn btn-primary">Add to Database</button>
+        </form>
     }
 }
 else
