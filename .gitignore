@@ -119,3 +119,4 @@ src/.vs/config/applicationhost.config
 
 # Environment files for storing API keys
 .env
+/appsettings.json
