@@ -1,6 +1,6 @@
 ﻿@page
 
-<h2>Simple Chart Example</h2>
+<h2>Stock Prices Chart</h2>
 
 <!-- Canvas for the chart -->
 <canvas id="myChart" width="400" height="200"></canvas>
@@ -15,10 +15,10 @@
         var chart = new Chart(ctx, {
             type: 'bar', // You can use 'line', 'pie', 'doughnut', etc.
             data: {
-                labels: ['January', 'February', 'March', 'April', 'May'], // X-axis labels
+                labels: ['Microsoft', 'Apple', 'Amazon', 'Nvidia', 'Intel'], // X-axis labels
                 datasets: [{
                     label: 'Sample Data',
-                    data: [10, 20, 30, 40, 50], // Example data
+                    data: [418.02, 226.90, 185.42, 118.81, 22.46], // Example data
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
