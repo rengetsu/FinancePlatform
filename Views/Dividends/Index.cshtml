@@ -1,3 +1,4 @@
+@model FinancePlatform.Models.ViewModels.DividendCalendarViewModel
 @{
     ViewData["Title"] = "Dividends";
 }
@@ -23,54 +24,17 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <th scope="row">DEMO-A</th>
-                <td>Amber Grove Energy</td>
-                <td class="text-end">$0.85</td>
-                <td>Quarterly</td>
-                <td>2026-09-15</td>
-                <td>2026-10-01</td>
-            </tr>
-            <tr>
-                <th scope="row">DEMO-B</th>
-                <td>Blue Harbor Foods</td>
-                <td class="text-end">$0.42</td>
-                <td>Quarterly</td>
-                <td>2026-09-18</td>
-                <td>2026-10-05</td>
-            </tr>
-            <tr>
-                <th scope="row">DEMO-C</th>
-                <td>Cedar Valley Properties</td>
-                <td class="text-end">$0.24</td>
-                <td>Monthly</td>
-                <td>2026-09-21</td>
-                <td>2026-10-08</td>
-            </tr>
-            <tr>
-                <th scope="row">DEMO-D</th>
-                <td>Dawn Ridge Technologies</td>
-                <td class="text-end">$0.30</td>
-                <td>Quarterly</td>
-                <td>2026-09-23</td>
-                <td>2026-10-12</td>
-            </tr>
-            <tr>
-                <th scope="row">DEMO-E</th>
-                <td>Elm Coast Utilities</td>
-                <td class="text-end">$1.10</td>
-                <td>Quarterly</td>
-                <td>2026-09-25</td>
-                <td>2026-10-15</td>
-            </tr>
-            <tr>
-                <th scope="row">DEMO-F</th>
-                <td>Fern Lake Industries</td>
-                <td class="text-end">$1.75</td>
-                <td>Semiannual</td>
-                <td>2026-09-28</td>
-                <td>2026-10-20</td>
-            </tr>
+            @foreach (var dividend in Model.Dividends)
+            {
+                <tr>
+                    <th scope="row">@dividend.Ticker</th>
+                    <td>@dividend.CompanyName</td>
+                    <td class="text-end">@dividend.AmountPerShare.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
+                    <td>@dividend.Frequency</td>
+                    <td>@dividend.ExDividendDate.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)</td>
+                    <td>@dividend.PaymentDate.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture)</td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>

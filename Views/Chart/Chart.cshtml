@@ -1,29 +1,24 @@
+@model FinancePlatform.Models.ViewModels.StockOverviewViewModel
 @{
     ViewData["Title"] = "Stock Chart";
 }
 <section class="market-page">
-    <header class="market-heading"><div><span class="market-eyebrow">MARKET OVERVIEW</span><h1>Stock prices, at a glance</h1><p>Compare sample share prices across ten familiar companies.</p></div><a class="btn btn-outline-primary" asp-controller="Table" asp-action="Table">Browse stock table &rarr;</a></header>
+    <header class="market-heading"><div><span class="market-eyebrow">MARKET OVERVIEW</span><h1>Stock prices, at a glance</h1><p>Compare sample share prices across @Model.CompanyCount familiar companies.</p></div><a class="btn btn-outline-primary" asp-controller="Table" asp-action="Table">Browse stock table &rarr;</a></header>
     <div class="market-stats">
-        <div class="market-stat"><span>Companies compared</span><strong>10 <small>stocks</small></strong></div>
-        <div class="market-stat"><span>Highest sample price</span><strong>$573.22 <small>META</small></strong></div>
-        <div class="market-stat"><span>Lowest sample price</span><strong>$10.48 <small>F</small></strong></div>
+        <div class="market-stat"><span>Companies compared</span><strong>@Model.CompanyCount <small>stocks</small></strong></div>
+        <div class="market-stat"><span>Highest sample price</span><strong>@(Model.HighestPrice?.Price.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US")) ?? "—") <small>@Model.HighestPrice?.Ticker</small></strong></div>
+        <div class="market-stat"><span>Lowest sample price</span><strong>@(Model.LowestPrice?.Price.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US")) ?? "—") <small>@Model.LowestPrice?.Ticker</small></strong></div>
     </div>
     <div class="market-card">
         <div class="market-card-heading"><div><h2>Price comparison</h2><p>Price per share in US dollars</p></div><span class="market-demo">Sample data</span></div>
         <div id="chartError" class="alert alert-info mx-4" hidden>The chart could not load. Sample prices are listed below.</div>
-        <div class="market-chart"><canvas id="myChart" role="img" aria-label="Ten sample stock prices. A text table follows the chart."></canvas></div>
+        <div class="market-chart" style="height: @(Math.Max(460, Model.CompanyCount * 38 + 60))px"><canvas id="myChart" role="img" aria-label="@Model.CompanyCount sample stock prices. A text table follows the chart."></canvas></div>
         <details class="market-chart-data"><summary>View chart data</summary>
             <table class="table mt-3"><caption>Sample prices in USD.</caption><thead><tr><th scope="col">Company</th><th scope="col" class="text-end">Price (USD)</th></tr></thead><tbody>
-                <tr><th scope="row">Meta</th><td class="text-end">$573.22</td></tr>
-                <tr><th scope="row">Microsoft</th><td class="text-end">$418.02</td></tr>
-                <tr><th scope="row">Tesla</th><td class="text-end">$249.52</td></tr>
-                <tr><th scope="row">Apple</th><td class="text-end">$226.90</td></tr>
-                <tr><th scope="row">Amazon</th><td class="text-end">$185.42</td></tr>
-                <tr><th scope="row">Nvidia</th><td class="text-end">$118.81</td></tr>
-                <tr><th scope="row">Alibaba</th><td class="text-end">$115.10</td></tr>
-                <tr><th scope="row">Nike</th><td class="text-end">$88.07</td></tr>
-                <tr><th scope="row">Intel</th><td class="text-end">$22.46</td></tr>
-                <tr><th scope="row">Ford</th><td class="text-end">$10.48</td></tr>
+                @foreach (var stock in Model.Quotes)
+                {
+                    <tr data-price="@stock.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"><th scope="row">@stock.CompanyName</th><td class="text-end">@stock.Price.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td></tr>
+                }
             </tbody></table>
         </details>
         <div class="market-note">Illustrative prices only, not live market data. Share price alone does not indicate company value.</div>
@@ -45,7 +40,7 @@
                 type: 'bar',
                 data: {
                     labels: rows.map(row => row.cells[0].textContent),
-                    datasets: [{ label: 'Sample price', data: rows.map(row => Number(row.cells[1].textContent.replace('$', ''))), backgroundColor: '#4875df', hoverBackgroundColor: '#294fac', borderRadius: 5, maxBarThickness: 24 }]
+                    datasets: [{ label: 'Sample price', data: rows.map(row => Number(row.dataset.price)), backgroundColor: '#4875df', hoverBackgroundColor: '#294fac', borderRadius: 5, maxBarThickness: 24 }]
                 },
                 options: {
                     indexAxis: 'y', responsive: true, maintainAspectRatio: false,
