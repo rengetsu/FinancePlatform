@@ -1,76 +1,65 @@
-﻿using FinancePlatform.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text.Json;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using FinancePlatform.Models.ViewModels;
+using FinancePlatform.Services;
+using Microsoft.AspNetCore.Mvc;
+using Npgsql;
 
-namespace FinancePlatform.Controllers
+namespace FinancePlatform.Controllers;
+
+public class StockController(MarketApiClient api, IMarketRepository repository,
+    ImportPreviewProtector previews, ILogger<StockController> logger) : Controller
 {
-    public class StockController : Controller
+    [HttpGet]
+    public IActionResult StockView() => View(new MarketImportViewModel());
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> SubmitStock([Bind(Prefix = "Input")] MarketImportInput input, CancellationToken ct)
     {
-        private readonly HttpClient _httpClient;
-
-        public StockController(HttpClient httpClient)
+        var model = new MarketImportViewModel { Input = input };
+        if (input.Date > DateOnly.FromDateTime(DateTime.UtcNow))
+            ModelState.AddModelError("Input.Date", "Choose today or an earlier date.");
+        if (!ModelState.IsValid) return View("StockView", model);
+        try
         {
-            _httpClient = httpClient;
+            model.Preview = await api.FetchAsync(input.Ticker.ToUpperInvariant(), input.Date!.Value, input.Dividend, ct);
+            model.Token = previews.Protect(model.Preview);
         }
-
-        [HttpGet]
-        public IActionResult StockView()
+        catch (InvalidOperationException ex) { ModelState.AddModelError("", ex.Message); }
+        catch (Exception ex) when (ex is HttpRequestException or JsonException or KeyNotFoundException or FormatException or TaskCanceledException)
         {
-            return View();
+            ModelState.AddModelError("", "Could not retrieve valid data from the provider. Try again later.");
         }
+        return View("StockView", model);
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> SubmitStock(string stockData, DateTime stockTimeData)
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddToDatabase(string? token, CancellationToken ct)
+    {
+        var model = new MarketImportViewModel();
+        if (string.IsNullOrWhiteSpace(token))
         {
-            // Format the date to 'yyyy-MM-dd'
-            string formattedDate = stockTimeData.ToString("yyyy-MM-dd");
-
-            StockResponse stockInfo = await GetStockDataAsync(stockData, formattedDate);
-
-            // Return the StockView again
-            return View("StockView", stockInfo);
+            ModelState.AddModelError("", "Fetch a preview before saving.");
+            return View("StockView", model);
         }
-
-        private async Task<StockResponse> GetStockDataAsync(string stockSymbol, string date)
+        try { model.Preview = previews.Unprotect(token); }
+        catch (Exception ex) when (ex is CryptographicException or JsonException or InvalidOperationException)
         {
-            string apiKey = "9aOImHeQjnqwk8XwwkMyTdMU_5YrTw30"; // Replace with your actual API key
-            string url = $"https://api.polygon.io/v2/aggs/ticker/{stockSymbol}/range/1/day/{date}/{date}?apiKey={apiKey}";
-
-            var response = await _httpClient.GetAsync(url);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var jsonData = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(jsonData);
-                var stockResponse = JsonSerializer.Deserialize<StockResponse>(jsonData);
-                return stockResponse;
-            }
-
-            return null;
+            ModelState.AddModelError("", "Preview expired or was changed. Fetch it again before saving.");
+            return View("StockView", model);
         }
-
-        [HttpPost]
-        public IActionResult AddToDatabase(string ticker, string date)
+        model.Input = new() { Ticker = model.Preview.Ticker, Date = model.Preview.Date, Dividend = model.Preview.Dividend is not null };
+        try
         {
-            // Your logic to add stock data to the database
-
-            // Example: Create a new stock entry
-            var stockData = new StockEntity
-            {
-                Ticker = ticker,
-                Date = DateTime.Parse(date),
-                // Add more stock-related data as needed
-            };
-
-            // Assuming you have a DbContext for your database:
-            //_dbContext.Stocks.Add(stockData);
-            //_dbContext.SaveChanges();
-
-            // Redirect to another view or show success message
-            return RedirectToAction("StockView");
+            await repository.SaveAsync(model.Preview, ct);
+            model.Message = "Saved successfully. Switch a data page to Database to see this record. Repeated saves update the same record.";
         }
+        catch (Exception ex) when (ex is NpgsqlException or InvalidOperationException or ArgumentException or TimeoutException)
+        {
+            logger.LogWarning("Database save failed ({ErrorType}).", ex.GetType().Name);
+            model.Token = token;
+            ModelState.AddModelError("", "Save failed. Check the database configuration and connection, then retry. Your preview is valid for 20 minutes.");
+        }
+        return View("StockView", model);
     }
 }

@@ -1,0 +1,24 @@
+name: financeplatform
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__Finance: "Host=db;Database=financeplatform;Username=financeplatform;Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env};Timeout=3;Command Timeout=5"
+      ApiKeys__Polygon: "${POLYGON_API_KEY:-}"
+    # No dependency/health check: demo pages work even when db is stopped.
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: financeplatform
+      POSTGRES_USER: financeplatform
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - finance-data:/var/lib/postgresql/data
+      - ./database/001-initial.sql:/docker-entrypoint-initdb.d/001-initial.sql:ro
+volumes:
+  finance-data:

@@ -1,0 +1,13 @@
+@model FinancePlatform.Models.SourceStatus
+<div class="mb-4">
+    <form method="get" class="d-flex gap-2 align-items-center mb-2">
+        <span class="fw-bold me-2">Data source</span>
+        <button type="submit" name="source" value="Demo" class="btn @(Model.Source == DataSource.Demo ? "btn-primary" : "btn-outline-primary")" aria-pressed="@(Model.Source == DataSource.Demo ? "true" : "false")">Demo</button>
+        <button type="submit" name="source" value="Database" class="btn @(Model.Source == DataSource.Database ? "btn-primary" : "btn-outline-primary")" aria-pressed="@(Model.Source == DataSource.Database ? "true" : "false")">Database</button>
+    </form>
+    <p class="text-muted mb-2">@Model.Description</p>
+    @if (Model.Error is not null)
+    {
+        <div class="alert alert-warning" role="alert">@Model.Error</div>
+    }
+</div>

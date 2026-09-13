@@ -17,6 +17,11 @@ builder.Services.AddSingleton<StockService>(); // Register StockService
 builder.Services.AddSingleton<IStockQuoteService, SampleStockQuoteService>();
 builder.Services.AddSingleton<IDividendService, SampleDividendService>();
 builder.Services.AddSingleton<DividendIncomeCalculator>();
+builder.Services.AddScoped<IMarketRepository, PostgresMarketRepository>();
+builder.Services.AddScoped<MarketDataService>();
+builder.Services.AddHttpClient<MarketApiClient>(client => client.Timeout = TimeSpan.FromSeconds(20));
+builder.Services.AddDataProtection();
+builder.Services.AddSingleton<ImportPreviewProtector>();
 
 var app = builder.Build();
 

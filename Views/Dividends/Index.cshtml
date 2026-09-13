@@ -3,17 +3,19 @@
     ViewData["Title"] = "Dividends";
 }
 
+<partial name="_DataSource" model="Model.SourceStatus" />
 <h2>Dividends</h2>
-<p class="text-muted">A sample dividend calendar with upcoming payments.</p>
-<p><a class="btn btn-outline-primary" asp-controller="DividendCalculator" asp-action="Index">Calculate dividend income &rarr;</a></p>
+@if (Model.Dividends.Count == 0 && Model.SourceStatus.Error is null) { <div class="alert alert-info">No saved dividends yet. Fetch and save a dividend on the <a asp-controller="Stock" asp-action="StockView">API page</a>.</div> }
+<p class="text-muted">Dividend calendar with recorded payment dates.</p>
+<p><a class="btn btn-outline-primary" asp-controller="DividendCalculator" asp-action="Index" asp-route-source="@Model.SourceStatus.Source">Calculate dividend income &rarr;</a></p>
 
 <div class="alert alert-info">
-    Demo data only. All companies, tickers, amounts, and dates below are fictional.
+    @Model.SourceStatus.Description
 </div>
 
 <div class="table-responsive">
     <table class="table table-striped table-hover align-middle">
-        <caption>Sample dividends. Amounts are per share in USD; dates use YYYY-MM-DD.</caption>
+        <caption>Dividends. Amounts are per share in USD; dates use YYYY-MM-DD.</caption>
         <thead>
             <tr>
                 <th scope="col">Ticker</th>

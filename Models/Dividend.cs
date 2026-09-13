@@ -2,10 +2,10 @@ namespace FinancePlatform.Models;
 
 public enum DividendFrequency
 {
-    Monthly,
-    Quarterly,
-    Semiannual,
-    Annual
+    Monthly = 0,
+    Quarterly = 1,
+    Semiannual = 2,
+    Annual = 3
 }
 
 public sealed record Dividend(

@@ -1,53 +1,36 @@
-﻿@model FinancePlatform.Models.StockResponse
-
-<img src="~/images/polygon_io_logo.png" alt="Polygon.io logo" width="300"/>
-<hr>
-<h2>Submit a Stock Symbol</h2>
-
-<form asp-controller="Stock" asp-action="SubmitStock" method="post">
-    <input type="text" name="stockData" placeholder="Enter stock symbol" required />
-    <input type="date" name="stockTimeData" placeholder="Enter stock date" value="2024-09-25" min="2018-01-01" max="2024-12-31" required /> 
-    <button type="submit" class="btn btn-primary">Submit Stock</button>
-</form>
-
-@if (Model != null)
-{
-    <hr>
-    <h3>Query Data:</h3>
-    <hr>
-    <h5><b>Ticker:</b> @Model.Ticker</h5>
-    <h5><b>Query Count:</b> @Model.QueryCount</h5>
-    <h5><b>Results Count:</b> @Model.ResultsCount</h5>
-    <h5><b>Adjusted:</b> @(Model.Adjusted ? "Yes" : "No")</h5>
-    <h5><b>Status:</b> @Model.Status</h5>
-    <h5><b>Request ID:</b> @Model.Request_Id</h5>
-    <h5><b>Count:</b> @Model.Count</h5>
-
-    @if (Model.Results != null && Model.Results.Any())
+@model FinancePlatform.Models.ViewModels.MarketImportViewModel
+@using System.Globalization
+@{ ViewData["Title"] = "Market Data Import"; }
+<section class="market-page">
+    <header class="market-heading"><div><span class="market-eyebrow">API IMPORT</span><h1>Fetch, preview, then save</h1><p>Retrieve provider data on demand. Nothing is saved until you choose Save to database.</p></div></header>
+    <div class="alert alert-info">Stock prices are daily closing prices for the selected date. Dividend lookup returns the latest recurring dividend on or before that date. Provider access may be delayed or limited by your plan. Currency: USD.</div>
+    <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+    @if (Model.Message is not null) { <div class="alert alert-success" role="status">@Model.Message</div> }
+    <form asp-action="SubmitStock" method="post" class="market-card p-4 mb-4">
+        <div class="row g-3">
+            <div class="col-md-4"><label asp-for="Input.Ticker" class="form-label">Ticker</label><input asp-for="Input.Ticker" class="form-control" placeholder="AAPL" /></div>
+            <div class="col-md-4"><label asp-for="Input.Date" class="form-label">Date / dividend cutoff</label><input asp-for="Input.Date" type="date" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Input.Dividend" class="form-label">Data to retrieve</label><select asp-for="Input.Dividend" class="form-select"><option value="false">Daily stock close</option><option value="true">Latest recurring dividend</option></select></div>
+        </div>
+        <div><button type="submit" class="btn btn-primary mt-3">Fetch preview</button></div>
+    </form>
+    @if (Model.Preview is { } preview)
     {
-        <hr>
-        <h3>Stock Data:</h3>
-        <hr>
-        @foreach (var result in Model.Results)
-        {
-            <h5><b>Volume:</b> @result.V</h5>
-            <h5><b>VWAP:</b> @result.Vw</h5>
-            <h5><b>Open Price:</b> @result.O</h5>
-            <h5><b>Close Price:</b> @result.C</h5>
-            <h5><b>High Price:</b> @result.H</h5>
-            <h5><b>Low Price:</b> @result.L</h5>
-            <h5><b>Timestamp (Unix):</b> @result.T</h5>
-            <h5><b>Number of Transactions:</b> @result.N</h5>
-        }
-        <!-- Add to Database button -->
-        <form asp-action="AddToDatabase" method="post">
-            <input type="hidden" name="ticker" value="@Model.Ticker" />
-            <input type="hidden" name="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" /> <!-- Add relevant date -->
-            <button type="submit" class="btn btn-primary">Add to Database</button>
-        </form>
+        <div class="market-card p-4">
+            <h2 class="h4">@preview.Ticker preview</h2>
+            @if (preview.ClosePrice is { } price)
+            {
+                <p>Closing price on @preview.Date.ToString("yyyy-MM-dd"): <strong>@price.ToString("C2", CultureInfo.GetCultureInfo("en-US"))</strong></p>
+            }
+            @if (preview.Dividend is { } dividend)
+            {
+                <p>@dividend.AmountPerShare.ToString("C2", CultureInfo.GetCultureInfo("en-US")) per share · @dividend.Frequency</p>
+                <p>Ex-dividend: @dividend.ExDividendDate.ToString("yyyy-MM-dd") · Payment: @dividend.PaymentDate.ToString("yyyy-MM-dd")</p>
+            }
+            @if (Model.Token is not null)
+            {
+                <form asp-action="AddToDatabase" method="post"><input type="hidden" name="token" value="@Model.Token" /><button type="submit" class="btn btn-success">Save to database</button></form>
+            }
+        </div>
     }
-}
-else
-{
-    <h2>No data available.</h2>
-}
+</section>

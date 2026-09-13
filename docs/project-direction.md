@@ -9,7 +9,9 @@
 - Other pages display saved database data when selected; selecting database mode should not itself fetch live API data.
 - Demo mode must remain usable without database or API availability.
 
-This is the intended future behavior. The current stock and dividend services still provide only in-memory sample data.
+The demo/database switches, PostgreSQL storage, and explicit preview/save API
+workflow are now implemented. See [database setup](database-setup.md). Demo
+services still provide the default in-memory sample data independently of the database.
 
 ## Collaboration preference
 

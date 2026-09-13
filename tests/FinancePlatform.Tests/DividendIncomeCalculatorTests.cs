@@ -74,10 +74,10 @@ public class DividendIncomeCalculatorTests
     }
 
     [Fact]
-    public void UnknownTickerReturnsValidationErrorWithoutResult()
+    public async Task UnknownTickerReturnsValidationErrorWithoutResult()
     {
-        var controller = new DividendCalculatorController(new SampleDividendService(), calculator);
-        var response = Assert.IsType<ViewResult>(controller.Index(new DividendCalculatorInput { Ticker = "UNKNOWN", Shares = 100 }));
+        var controller = new DividendCalculatorController(new MarketDataService(new SampleStockQuoteService(), new SampleDividendService(), new ThrowingRepository(), Microsoft.Extensions.Logging.Abstractions.NullLogger<MarketDataService>.Instance), calculator);
+        var response = Assert.IsType<ViewResult>(await controller.Index(new DividendCalculatorInput { Ticker = "UNKNOWN", Shares = 100 }));
         var model = Assert.IsType<DividendCalculatorViewModel>(response.Model);
         Assert.False(controller.ModelState.IsValid);
         Assert.Null(model.Result);
@@ -85,10 +85,10 @@ public class DividendIncomeCalculatorTests
     }
 
     [Fact]
-    public void ValidSubmissionUsesServerSideSampleAmount()
+    public async Task ValidSubmissionUsesServerSideSampleAmount()
     {
-        var controller = new DividendCalculatorController(new SampleDividendService(), calculator);
-        var response = Assert.IsType<ViewResult>(controller.Index(new DividendCalculatorInput { Ticker = "DEMO-A", Shares = 100 }));
+        var controller = new DividendCalculatorController(new MarketDataService(new SampleStockQuoteService(), new SampleDividendService(), new ThrowingRepository(), Microsoft.Extensions.Logging.Abstractions.NullLogger<MarketDataService>.Instance), calculator);
+        var response = Assert.IsType<ViewResult>(await controller.Index(new DividendCalculatorInput { Ticker = "DEMO-A", Shares = 100 }));
         var model = Assert.IsType<DividendCalculatorViewModel>(response.Model);
         Assert.Equal(340m, model.Result!.AnnualIncome);
     }

@@ -5,32 +5,37 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinancePlatform.Controllers;
 
-public class DividendCalculatorController(
-    IDividendService dividends,
-    DividendIncomeCalculator calculator) : Controller
+public class DividendCalculatorController(MarketDataService data, DividendIncomeCalculator calculator) : Controller
 {
     [HttpGet]
-    public IActionResult Index() => View(CreateViewModel(new DividendCalculatorInput()));
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Index([Bind(Prefix = "Input")] DividendCalculatorInput input)
+    public async Task<IActionResult> Index(DataSource source = DataSource.Demo, CancellationToken ct = default)
     {
-        var companies = dividends.GetDividends();
-        var selected = companies.FirstOrDefault(dividend => dividend.Ticker == input.Ticker);
-        if (!string.IsNullOrWhiteSpace(input.Ticker) && selected is null)
-            ModelState.AddModelError("Input.Ticker", "Select a company from the sample list.");
-
-        if (!ModelState.IsValid)
-            return View(new DividendCalculatorViewModel { Input = input, Companies = companies });
-
-        var result = calculator.Calculate(selected!, input.Shares!.Value);
-        return View(new DividendCalculatorViewModel { Input = input, Companies = companies, Result = result });
+        var result = await data.GetDividendsAsync(source, ct);
+        return View(new DividendCalculatorViewModel { Companies = Latest(result.Items), SourceStatus = result.Status });
     }
 
-    private DividendCalculatorViewModel CreateViewModel(DividendCalculatorInput input) => new()
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Index([Bind(Prefix = "Input")] DividendCalculatorInput input,
+        DataSource source = DataSource.Demo, CancellationToken ct = default)
     {
-        Input = input,
-        Companies = dividends.GetDividends()
-    };
+        var result = await data.GetDividendsAsync(source, ct);
+        var companies = Latest(result.Items);
+        var selected = companies.FirstOrDefault(dividend => dividend.Ticker == input.Ticker);
+        if (!string.IsNullOrWhiteSpace(input.Ticker) && selected is null)
+            ModelState.AddModelError("Input.Ticker", "Select a company from the selected data source.");
+        if (result.Status.Error is not null)
+            ModelState.AddModelError("", "Income cannot be calculated while the database is unavailable.");
+        var income = ModelState.IsValid && selected is not null && input.Shares is > 0
+            ? calculator.Calculate(selected, input.Shares.Value) : null;
+        return View(new DividendCalculatorViewModel
+        {
+            Input = input, Companies = companies, SourceStatus = result.Status, Result = income
+        });
+    }
+
+    // One recurring dividend per ticker, so historical imports are never added together.
+    private static IReadOnlyList<Dividend> Latest(IReadOnlyList<Dividend> dividends) => dividends
+        .GroupBy(dividend => dividend.Ticker)
+        .Select(group => group.OrderByDescending(dividend => dividend.ExDividendDate).First())
+        .OrderBy(dividend => dividend.Ticker).ToArray();
 }

@@ -4,8 +4,8 @@ namespace FinancePlatform.Models.ViewModels;
 
 public sealed class DividendCalculatorInput
 {
-    [Required(ErrorMessage = "Select a sample company.")]
-    [Display(Name = "Sample company")]
+    [Required(ErrorMessage = "Select a company.")]
+    [Display(Name = "Company")]
     public string? Ticker { get; set; }
 
     [Required(ErrorMessage = "Enter the number of shares.")]
@@ -17,6 +17,7 @@ public sealed class DividendCalculatorInput
 
 public sealed class DividendCalculatorViewModel
 {
+    public SourceStatus SourceStatus { get; init; } = new(DataSource.Demo);
     public DividendCalculatorInput Input { get; init; } = new();
     public IReadOnlyList<Dividend> Companies { get; init; } = Array.Empty<Dividend>();
     public DividendIncome? Result { get; init; }

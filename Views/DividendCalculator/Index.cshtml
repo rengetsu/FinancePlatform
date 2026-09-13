@@ -6,21 +6,23 @@
 }
 
 <section class="market-page">
+    <partial name="_DataSource" model="Model.SourceStatus" />
+    @if (Model.Companies.Count == 0 && Model.SourceStatus.Error is null) { <div class="alert alert-info">No saved dividends yet. Import a dividend on the <a asp-controller="Stock" asp-action="StockView">API page</a> to calculate income.</div> }
     <header class="market-heading">
         <div>
             <span class="market-eyebrow">DIVIDEND PLANNING</span>
             <h1>Estimate your dividend income</h1>
-            <p>Explore how your share count changes the income from a sample dividend.</p>
+            <p>Explore how your share count changes the income from a dividend.</p>
         </div>
-        <a class="btn btn-outline-primary" asp-controller="Dividends" asp-action="Index">Dividend calendar &rarr;</a>
+        <a class="btn btn-outline-primary" asp-controller="Dividends" asp-action="Index" asp-route-source="@Model.SourceStatus.Source">Dividend calendar &rarr;</a>
     </header>
 
     <div class="market-card mb-4">
         <div class="market-card-heading">
-            <div><h2>Your shares</h2><p>Choose a fictional company and enter whole or fractional shares.</p></div>
-            <span class="market-demo">Sample data</span>
+            <div><h2>Your shares</h2><p>Choose a company and enter whole or fractional shares.</p></div>
+            <span class="market-demo">@Model.SourceStatus.Label</span>
         </div>
-        <form asp-controller="DividendCalculator" asp-action="Index" method="post" class="px-4 pb-4">
+        <form asp-controller="DividendCalculator" asp-action="Index" asp-route-source="@Model.SourceStatus.Source" method="post" class="px-4 pb-4">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="row g-3 align-items-start">
                 <div class="col-md-7">
@@ -42,7 +44,7 @@
             </div>
             <button type="submit" class="btn btn-primary mt-4">Calculate income</button>
         </form>
-        <div class="market-note">Uses fictional dividends only. No database or live market connection is needed.</div>
+        <div class="market-note">@Model.SourceStatus.Description</div>
     </div>
 
     @if (Model.Result is { } result)

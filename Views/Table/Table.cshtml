@@ -3,32 +3,34 @@
     ViewData["Title"] = "Stock Table";
 }
 <section class="market-page">
-    <header class="market-heading"><div><span class="market-eyebrow">MARKET OVERVIEW</span><h1>Explore the stock list</h1><p>A simple snapshot of companies and their sample share prices.</p></div><a class="btn btn-outline-primary" asp-controller="Chart" asp-action="Chart">View price chart &rarr;</a></header>
+    <partial name="_DataSource" model="Model.SourceStatus" />
+    @if (Model.CompanyCount == 0 && Model.SourceStatus.Error is null) { <div class="alert alert-info">No saved stocks yet. Fetch and save a price on the <a asp-controller="Stock" asp-action="StockView">API page</a>.</div> }
+    <header class="market-heading"><div><span class="market-eyebrow">MARKET OVERVIEW</span><h1>Explore the stock list</h1><p>A simple snapshot of companies and their share prices.</p></div><a class="btn btn-outline-primary" asp-controller="Chart" asp-action="Chart" asp-route-source="@Model.SourceStatus.Source">View price chart &rarr;</a></header>
     <div class="market-stats">
         <div class="market-stat"><span>Companies listed</span><strong>@Model.CompanyCount <small>stocks</small></strong></div>
         <div class="market-stat"><span>Currency</span><strong>USD <small>US dollar</small></strong></div>
-        <div class="market-stat"><span>Data source</span><strong>Demo <small>static prices</small></strong></div>
+        <div class="market-stat"><span>Data source</span><strong>@Model.SourceStatus.Label</strong></div>
     </div>
     <div class="market-card">
-        <div class="market-card-heading"><div><h2>All stocks</h2><p id="stockCount" role="status">Showing @Model.CompanyCount companies</p></div><span class="market-demo">Sample data</span></div>
+        <div class="market-card-heading"><div><h2>All stocks</h2><p id="stockCount" role="status">Showing @Model.CompanyCount companies</p></div><span class="market-demo">@Model.SourceStatus.Label</span></div>
         <div class="market-toolbar">
             <div class="market-search"><label for="stockSearch" class="form-label">Find a company</label><input id="stockSearch" type="search" class="form-control" placeholder="Search ticker or company..." /></div>
             <div><label for="stockSort" class="form-label">Sort by</label><select id="stockSort" class="form-select"><option value="price-desc">Price: high to low</option><option value="price-asc">Price: low to high</option><option value="ticker">Ticker: A to Z</option><option value="company">Company: A to Z</option></select></div>
         </div>
         <div class="table-responsive">
-            <table class="table market-table mb-0"><caption class="visually-hidden">Sample stock prices in US dollars.</caption><thead><tr><th scope="col">Ticker</th><th scope="col">Company name</th><th scope="col" class="text-end">Price (USD)</th></tr></thead>
+            <table class="table market-table mb-0"><caption class="visually-hidden">Stock prices in US dollars.</caption><thead><tr><th scope="col">Ticker</th><th scope="col">Company name</th><th scope="col" class="text-end">Price (USD)</th><th scope="col">Price date</th></tr></thead>
                 <tbody id="stockRows">
                     @foreach (var stock in Model.Quotes)
                     {
                         <tr data-ticker="@stock.Ticker" data-company="@stock.CompanyName" data-price="@stock.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)">
-                            <th scope="row"><span class="market-ticker">@stock.Ticker</span></th><td>@stock.CompanyName</td><td class="text-end market-price">@stock.Price.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
+                            <th scope="row"><span class="market-ticker">@stock.Ticker</span></th><td>@stock.CompanyName</td><td class="text-end market-price">@stock.Price.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td><td>@(stock.PriceDate?.ToString("yyyy-MM-dd") ?? "Demo")</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
         <div id="stockEmpty" class="market-empty" hidden><strong>No matching companies</strong><p>Try another company name or ticker.</p><button type="button" class="btn btn-outline-primary" id="clearSearch">Clear search</button></div>
-        <div class="market-note">Illustrative prices only. This sample list is not connected to live market data.</div>
+        <div class="market-note">@Model.SourceStatus.Description</div>
     </div>
 </section>
 @section Scripts {
@@ -52,7 +54,7 @@
                     body.appendChild(row);
                 });
                 document.getElementById('stockCount').textContent = `Showing ${visible} of ${rows.length} companies`;
-                document.getElementById('stockEmpty').hidden = visible !== 0;
+                document.getElementById('stockEmpty').hidden = visible !== 0 || rows.length === 0;
             }
             search.addEventListener('input', update);
             sort.addEventListener('change', update);

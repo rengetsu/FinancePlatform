@@ -3,6 +3,7 @@
 [Oo]bj/
 
 # Logs
+.env
 Logs/
 
 # Generated files

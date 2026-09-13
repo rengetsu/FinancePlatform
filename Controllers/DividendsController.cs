@@ -1,10 +1,15 @@
+using FinancePlatform.Models;
 using FinancePlatform.Models.ViewModels;
 using FinancePlatform.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancePlatform.Controllers;
 
-public class DividendsController(IDividendService dividends) : Controller
+public class DividendsController(MarketDataService data) : Controller
 {
-    public IActionResult Index() => View(new DividendCalendarViewModel(dividends.GetDividends()));
+    public async Task<IActionResult> Index(DataSource source = DataSource.Demo, CancellationToken ct = default)
+    {
+        var result = await data.GetDividendsAsync(source, ct);
+        return View(new DividendCalendarViewModel(result.Items) { SourceStatus = result.Status });
+    }
 }
