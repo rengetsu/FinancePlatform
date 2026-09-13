@@ -1,88 +1,79 @@
-﻿@page
-
-<h2>Stock Prices Table</h2>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Ticker</th>
-            <th>Company Name</th>
-            <th>Stock Price</th>
-        </tr>
-    </thead>
-    <tr>
-        <td>NFLX</td>
-        <td>Netflix</td>
-        <td>712.78 $</td>
-    </tr>
-    <tr>
-        <td>META</td>
-        <td>Meta</td>
-        <td>573.22 $</td>
-    </tr>
-    <tr>
-        <td>MSFT</td>
-        <td>Microsoft</td>
-        <td>418.42 $</td>
-    </tr>
-    <tr>
-        <td>V</td>
-        <td>Visa Inc</td>
-        <td>276.28 $</td>
-    </tr>
-    <tr>
-        <td>TSLA</td>
-        <td>Tesla</td>
-        <td>249.18 $</td>
-    </tr>
-    <tr>
-        <td>AAPL</td>
-        <td>Apple</td>
-        <td>226.98 $</td>
-    </tr>
-    <tr>
-        <td>AMZN</td>
-        <td>Amazon</td>
-        <td>185.38 $</td>
-    </tr>
-    <tr>
-        <td>NVDA</td>
-        <td>Nvidia Corp</td>
-        <td>118.68 $</td>
-    </tr>
-    <tr>
-        <td>BABA</td>
-        <td>Alibaba</td>
-        <td>114.32 $</td>
-    </tr>
-    <tr>
-        <td>NKE</td>
-        <td>Nike</td>
-        <td>83.07 $</td>
-    </tr>
-    <tr>
-        <td>PYPL</td>
-        <td>PayPal Holdings Inc</td>
-        <td>77.23 $</td>
-    </tr>
-    <tr>
-        <td>PFE</td>
-        <td>Pfizer Inc</td>
-        <td>28.60 $</td>
-    </tr>
-    <tr>
-        <td>INTC</td>
-        <td>Intel</td>
-        <td>22.45 $</td>
-    </tr>
-    <tr>
-        <td>F</td>
-        <td>Ford</td>
-        <td>10.48 $</td>
-    </tr>
-    <tr>
-        <td>NIO</td>
-        <td>Nio Inc</td>
-        <td>7.14 $</td>
-    </tr>
-</table>
+@{
+    ViewData["Title"] = "Stock Table";
+    var stocks = new[] {
+        (Ticker: "NFLX", Company: "Netflix", Price: 712.78m),
+        (Ticker: "META", Company: "Meta", Price: 573.22m),
+        (Ticker: "MSFT", Company: "Microsoft", Price: 418.42m),
+        (Ticker: "V", Company: "Visa Inc", Price: 276.28m),
+        (Ticker: "TSLA", Company: "Tesla", Price: 249.18m),
+        (Ticker: "AAPL", Company: "Apple", Price: 226.98m),
+        (Ticker: "AMZN", Company: "Amazon", Price: 185.38m),
+        (Ticker: "NVDA", Company: "Nvidia Corp", Price: 118.68m),
+        (Ticker: "BABA", Company: "Alibaba", Price: 114.32m),
+        (Ticker: "NKE", Company: "Nike", Price: 83.07m),
+        (Ticker: "PYPL", Company: "PayPal Holdings Inc", Price: 77.23m),
+        (Ticker: "PFE", Company: "Pfizer Inc", Price: 28.60m),
+        (Ticker: "INTC", Company: "Intel", Price: 22.45m),
+        (Ticker: "F", Company: "Ford", Price: 10.48m),
+        (Ticker: "NIO", Company: "Nio Inc", Price: 7.14m)
+    };
+}
+<section class="market-page">
+    <header class="market-heading"><div><span class="market-eyebrow">MARKET OVERVIEW</span><h1>Explore the stock list</h1><p>A simple snapshot of companies and their sample share prices.</p></div><a class="btn btn-outline-primary" asp-controller="Chart" asp-action="Chart">View price chart &rarr;</a></header>
+    <div class="market-stats">
+        <div class="market-stat"><span>Companies listed</span><strong>@stocks.Length <small>stocks</small></strong></div>
+        <div class="market-stat"><span>Currency</span><strong>USD <small>US dollar</small></strong></div>
+        <div class="market-stat"><span>Data source</span><strong>Demo <small>static prices</small></strong></div>
+    </div>
+    <div class="market-card">
+        <div class="market-card-heading"><div><h2>All stocks</h2><p id="stockCount" role="status">Showing @stocks.Length companies</p></div><span class="market-demo">Sample data</span></div>
+        <div class="market-toolbar">
+            <div class="market-search"><label for="stockSearch" class="form-label">Find a company</label><input id="stockSearch" type="search" class="form-control" placeholder="Search ticker or company..." /></div>
+            <div><label for="stockSort" class="form-label">Sort by</label><select id="stockSort" class="form-select"><option value="price-desc">Price: high to low</option><option value="price-asc">Price: low to high</option><option value="ticker">Ticker: A to Z</option><option value="company">Company: A to Z</option></select></div>
+        </div>
+        <div class="table-responsive">
+            <table class="table market-table mb-0"><caption class="visually-hidden">Sample stock prices in US dollars.</caption><thead><tr><th scope="col">Ticker</th><th scope="col">Company name</th><th scope="col" class="text-end">Price (USD)</th></tr></thead>
+                <tbody id="stockRows">
+                    @foreach (var stock in stocks)
+                    {
+                        <tr data-ticker="@stock.Ticker" data-company="@stock.Company" data-price="@stock.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                            <th scope="row"><span class="market-ticker">@stock.Ticker</span></th><td>@stock.Company</td><td class="text-end market-price">@stock.Price.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div id="stockEmpty" class="market-empty" hidden><strong>No matching companies</strong><p>Try another company name or ticker.</p><button type="button" class="btn btn-outline-primary" id="clearSearch">Clear search</button></div>
+        <div class="market-note">Illustrative prices only. This sample list is not connected to live market data.</div>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        (() => {
+            const body = document.getElementById('stockRows');
+            const rows = Array.from(body.rows);
+            const search = document.getElementById('stockSearch');
+            const sort = document.getElementById('stockSort');
+            function update() {
+                const query = search.value.trim().toLowerCase();
+                rows.sort((a, b) => {
+                    if (sort.value === 'price-desc') return Number(b.dataset.price) - Number(a.dataset.price);
+                    if (sort.value === 'price-asc') return Number(a.dataset.price) - Number(b.dataset.price);
+                    return a.dataset[sort.value].localeCompare(b.dataset[sort.value]);
+                });
+                let visible = 0;
+                rows.forEach(row => {
+                    row.hidden = !(row.dataset.ticker + ' ' + row.dataset.company).toLowerCase().includes(query);
+                    if (!row.hidden) visible++;
+                    body.appendChild(row);
+                });
+                document.getElementById('stockCount').textContent = `Showing ${visible} of ${rows.length} companies`;
+                document.getElementById('stockEmpty').hidden = visible !== 0;
+            }
+            search.addEventListener('input', update);
+            sort.addEventListener('change', update);
+            document.getElementById('clearSearch').addEventListener('click', () => { search.value = ''; update(); search.focus(); });
+            update();
+        })();
+    </script>
+}
