@@ -1,19 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using FinancePlatform.Models.ViewModels;
+using FinancePlatform.Services;
+using Microsoft.AspNetCore.Mvc;
 
-namespace FinancePlatform.Controllers
+namespace FinancePlatform.Controllers;
+
+public class TableController(IStockQuoteService stockQuotes) : Controller
 {
-    public class TableController : Controller
-    {
-        // Action method to serve the Table.cshtml view
-        public IActionResult Table()
-        {
-            return View();
-        }
+    public IActionResult Table() => View(new StockOverviewViewModel(stockQuotes.GetQuotes()));
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-    }
+    public IActionResult Index() => View("Table", new StockOverviewViewModel(stockQuotes.GetQuotes()));
 }

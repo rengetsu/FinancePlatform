@@ -1,0 +1,65 @@
+@model FinancePlatform.Models.ViewModels.DividendCalculatorViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Dividend Income Calculator";
+    var usd = CultureInfo.GetCultureInfo("en-US");
+}
+
+<section class="market-page">
+    <header class="market-heading">
+        <div>
+            <span class="market-eyebrow">DIVIDEND PLANNING</span>
+            <h1>Estimate your dividend income</h1>
+            <p>Explore how your share count changes the income from a sample dividend.</p>
+        </div>
+        <a class="btn btn-outline-primary" asp-controller="Dividends" asp-action="Index">Dividend calendar &rarr;</a>
+    </header>
+
+    <div class="market-card mb-4">
+        <div class="market-card-heading">
+            <div><h2>Your shares</h2><p>Choose a fictional company and enter whole or fractional shares.</p></div>
+            <span class="market-demo">Sample data</span>
+        </div>
+        <form asp-controller="DividendCalculator" asp-action="Index" method="post" class="px-4 pb-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="row g-3 align-items-start">
+                <div class="col-md-7">
+                    <label asp-for="Input.Ticker" class="form-label"></label>
+                    <select asp-for="Input.Ticker" class="form-select" aria-describedby="tickerError">
+                        <option value="">Select a company</option>
+                        @foreach (var company in Model.Companies)
+                        {
+                            <option value="@company.Ticker">@company.CompanyName (@company.Ticker) — @company.AmountPerShare.ToString("C2", usd) / share · @company.Frequency</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.Ticker" id="tickerError" class="text-danger"></span>
+                </div>
+                <div class="col-md-5">
+                    <label asp-for="Input.Shares" class="form-label"></label>
+                    <input asp-for="Input.Shares" type="number" min="0.000001" max="1000000000" step="any" placeholder="e.g. 100 or 12.5" class="form-control" aria-describedby="sharesError" />
+                    <span asp-validation-for="Input.Shares" id="sharesError" class="text-danger"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">Calculate income</button>
+        </form>
+        <div class="market-note">Uses fictional dividends only. No database or live market connection is needed.</div>
+    </div>
+
+    @if (Model.Result is { } result)
+    {
+        <section aria-labelledby="incomeHeading">
+            <h2 id="incomeHeading" class="h4">Income estimate for @result.CompanyName</h2>
+            <p class="text-muted">@result.Shares.ToString("0.######", usd) shares × @result.DividendPerShare.ToString("C2", usd) per share, with @result.PaymentsPerYear payment(s) per year.</p>
+            <div class="market-stats">
+                <div class="market-stat"><span>Income per payment</span><strong>@result.IncomePerPayment.ToString("C2", usd)</strong></div>
+                <div class="market-stat"><span>Estimated annual income</span><strong>@result.AnnualIncome.ToString("C2", usd)</strong></div>
+                <div class="market-stat"><span>Monthly average income</span><strong>@result.MonthlyAverageIncome.ToString("C2", usd)</strong></div>
+            </div>
+            <div class="market-note rounded">The annual estimate assumes the dividend amount, payment frequency, and share count stay unchanged for a full year. The monthly average is annual income divided by 12, not a monthly payment schedule. Amounts are in USD before taxes and fees, without reinvestment, and displayed to the nearest cent.</div>
+        </section>
+    }
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

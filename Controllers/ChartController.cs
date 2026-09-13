@@ -1,24 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using FinancePlatform.Models.ViewModels;
+using FinancePlatform.Services;
+using Microsoft.AspNetCore.Mvc;
 
-namespace FinancePlatform.Controllers
+namespace FinancePlatform.Controllers;
+
+public class ChartController(IStockQuoteService stockQuotes) : Controller
 {
-    public class ChartController : Controller
-    {
-        // Action method to serve the Chart.cshtml view
-        public IActionResult Chart()
-        {
-            return View();
-        }
+    public IActionResult Chart() => View(new StockOverviewViewModel(stockQuotes.GetQuotes()));
 
-        public IActionResult Index()
-        {
-            // Example data, replace with actual data from your database
-            var chartData = new List<int> { 10, 20, 30, 40, 50 };
-
-            ViewBag.ChartData = chartData;
-
-            return View("Chart");
-        }
-    }
+    public IActionResult Index() => View("Chart", new StockOverviewViewModel(stockQuotes.GetQuotes()));
 }

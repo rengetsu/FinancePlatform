@@ -1,4 +1,5 @@
 using FinancePlatform.Controllers;
+using FinancePlatform.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +14,9 @@ builder.Services.AddHttpClient();
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<StockService>(); // Register StockService
+builder.Services.AddSingleton<IStockQuoteService, SampleStockQuoteService>();
+builder.Services.AddSingleton<IDividendService, SampleDividendService>();
+builder.Services.AddSingleton<DividendIncomeCalculator>();
 
 var app = builder.Build();
 
