@@ -16,6 +16,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddSingleton<StockService>(); // Register StockService
 builder.Services.AddSingleton<IStockQuoteService, SampleStockQuoteService>();
 builder.Services.AddSingleton<IDividendService, SampleDividendService>();
+builder.Services.AddSingleton<DividendIncomeCalculator>();
 
 var app = builder.Build();
 
