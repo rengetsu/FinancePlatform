@@ -1,24 +1,165 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Finance Platform";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <title>Finance Platform</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
-</head>
-<body>
+<div class="finance-hero">
     <div class="container">
-        <h1 class="mt-5">Finance Platform</h1>
-        <p>The Finance platform helps investors by providing stock market data from different API's in a user-friendly interface.</p>
+        <div class="row align-items-center min-vh-75">
+
+            <!-- Text -->
+            <div class="col-lg-6 finance-content">
+                <span class="finance-badge">FINANCIAL DATA PLATFORM</span>
+
+                <h1 class="finance-title">
+                    Smarter insights.<br />
+                    Better decisions.
+                </h1>
+
+                <p class="finance-description">
+                    Access stock market data from multiple sources through
+                    one simple and intuitive platform.
+                </p>
+
+                <div class="finance-actions">
+                    <a href="#" class="btn btn-primary btn-lg px-4">
+                        Explore Platform
+                    </a>
+
+                    <a href="#" class="btn btn-outline-dark btn-lg px-4">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                <div class="finance-image-wrapper">
+                    <img
+                        src="https://cdn.pixabay.com/photo/2022/03/09/03/47/finance-7056936_960_720.png"
+                        class="finance-image"
+                        alt="Finance market analytics illustration" />
+                </div>
+            </div>
+
+        </div>
     </div>
-    <img class="semi-transparent" width="830" src="https://cdn.pixabay.com/photo/2022/03/09/03/47/finance-7056936_960_720.png">
-    <style>
-        .semi-transparent {
-          opacity: 0.5;
+</div>
+
+<style>
+    .finance-hero {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f5f8fc 50%,
+            #edf3fa 100%
+        );
+        overflow: hidden;
+    }
+
+    .min-vh-75 {
+        min-height: 75vh;
+    }
+
+    .finance-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .finance-badge {
+        display: inline-block;
+        padding: 7px 14px;
+        margin-bottom: 22px;
+        border-radius: 20px;
+        background: #e8f1ff;
+        color: #0d6efd;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+    }
+
+    .finance-title {
+        font-size: clamp(2.8rem, 5vw, 4.8rem);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -2px;
+        color: #18202b;
+        margin-bottom: 24px;
+    }
+
+    .finance-description {
+        max-width: 540px;
+        font-size: 1.2rem;
+        line-height: 1.7;
+        color: #657080;
+        margin-bottom: 32px;
+    }
+
+    .finance-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .finance-actions .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .finance-image-wrapper {
+        position: relative;
+    }
+
+    .finance-image-wrapper::before {
+        content: "";
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        background: #dceaff;
+        filter: blur(60px);
+        opacity: 0.7;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .finance-image {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 650px;
+        height: auto;
+        opacity: 0.85;
+        transition: transform 0.3s ease;
+    }
+
+    .finance-image:hover {
+        transform: translateY(-6px);
+    }
+
+    @@media (max-width: 991px) {
+        .finance-hero {
+            padding: 70px 0;
         }
-    </style>
-</body>
-</html>
+
+        .finance-content {
+            text-align: center;
+        }
+
+        .finance-description {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .finance-actions {
+            justify-content: center;
+        }
+
+        .finance-title {
+            letter-spacing: -1px;
+        }
+    }
+</style>
